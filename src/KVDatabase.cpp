@@ -1,18 +1,27 @@
 //
-// Created by ltc on 2021/11/22.
+// Created by ltc on 2021/11/23.
 //
 
 #include "KVDatabase.h"
 
-KVDatabase::KVDatabase() : raft(ObjPool::allocate<Raft>()), server(ObjPool::allocate<TcpServer<Session>>()) {
-	raft->addServer(ConfigSystem::getConfig()["kv_database"]["port"].asInt(), IPV4, server);
-	raft->registerFuncHandler("set", setHandle);
+KVDatabaseServer &KVDatabase::getInstance() {
+	static KVDatabaseServer server;
+	return server;
 }
 
 void KVDatabase::serve() {
-	raft->serve();
+	getInstance().serve();
 }
 
-void setHandle(const string& cmd) {
+string KVDatabase::get(const string &key) {
+	return getInstance().get(key);
+}
 
+string KVDatabase::set(const string &key, const string& value) {
+	return getInstance().set(key, value);
+}
+
+void KVDatabase::setHandle(const string &cmd) {
+	vector<string> split = utils::split(cmd, ' ');
+	getInstance().data[split[0]] = split[1];
 }

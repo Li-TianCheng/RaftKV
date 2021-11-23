@@ -3,8 +3,7 @@
 
 int main() {
 	modules::init("../config/config.json");
-	KVDatabase database;
-	database.serve();
+	KVDatabase::serve();
 	modules::close();
 	return 0;
 }

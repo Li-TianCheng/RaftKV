@@ -1,24 +1,24 @@
 //
-// Created by ltc on 2021/11/22.
+// Created by ltc on 2021/11/23.
 //
 
 #ifndef RAFTKVDATABASE_KVDATABASE_H
 #define RAFTKVDATABASE_KVDATABASE_H
 
-#include "raft/include/Raft.h"
-#include "net/include/TcpServer.h"
-#include "Session.h"
+#include "KVDatabaseServer.h"
 
 class KVDatabase {
 public:
-	KVDatabase();
-	void serve();
+	static void serve();
+	static string get(const string& key);
+	static string set(const string& key, const string& value);
+	static void setHandle(const string& cmd);
 private:
-	shared_ptr<Raft> raft;
-	shared_ptr<TcpServer<Session>> server;
-	unordered_map<string, string> data;
+	KVDatabase() = default;
+	static KVDatabaseServer& getInstance();
+private:
+	KVDatabaseServer server;
 };
 
-static void setHandle(const string& cmd);
 
 #endif //RAFTKVDATABASE_KVDATABASE_H

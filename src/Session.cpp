@@ -9,5 +9,28 @@ Session::Session(int bufferChunkSize) : TcpSession(bufferChunkSize) {
 }
 
 void Session::handleReadDone(iter pos, size_t n) {
-	TcpSession::handleReadDone(pos, n);
+	for (size_t i = 0; i < n; i++) {
+		cmd += *pos++;
+	}
+	if (cmd.size() > 2 && cmd[cmd.size()-2] == '\r' && cmd[cmd.size()-1] == '\n') {
+		vector<string> split = utils::split(cmd.substr(0, cmd.size()-2), ' ');
+		shared_ptr<string> reply = ObjPool::allocate<string>();
+		if (split[0] == "GET") {
+			if (split.size() == 2) {
+				*reply = KVDatabase::get(split[1]);
+			} else {
+				*reply = "INPUT ERROR";
+			}
+		}
+		if (split[0] == "SET") {
+			if (split.size() == 3) {
+				*reply = KVDatabase::set(split[1], split[2]);
+			} else {
+				*reply = "INPUT ERROR";
+			}
+		}
+		*reply += "\r\n";
+		write(reply);
+	}
+	readDone(n);
 }
