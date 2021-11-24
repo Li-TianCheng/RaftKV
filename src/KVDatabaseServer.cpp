@@ -25,19 +25,7 @@ string KVDatabaseServer::get(const string &key) {
 		}
 		return data[key];
 	}
-	auto mutex = ObjPool::allocate<Mutex>();
-	auto condition = ObjPool::allocate<Condition>();
-	mutex->lock();
-	auto session = server->getSession();
-	shared_ptr<string> send = ObjPool::allocate<string>();
-	*send = "GET "+key+"\r\n";
-	static_pointer_cast<Session>(session)->send = send;
-	static_pointer_cast<Session>(session)->mutex = mutex;
-	static_pointer_cast<Session>(session)->condition = condition;
-	raft->getListener()->addNewSession(session, re+":"+ to_string(port), IPV4);
-	condition->wait(*mutex);
-	re = std::move(static_pointer_cast<Session>(session)->response);
-	mutex->unlock();
+	re = forward(re+":"+ to_string(port), "GET "+key);
 	if (re.empty()) {
 		re = "RETRY";
 	}
@@ -53,19 +41,7 @@ string KVDatabaseServer::set(const string &key, const string& value) {
 		return "ERROR";
 	}
 	if (!re.empty()) {
-		auto mutex = ObjPool::allocate<Mutex>();
-		auto condition = ObjPool::allocate<Condition>();
-		mutex->lock();
-		auto session = server->getSession();
-		shared_ptr<string> send = ObjPool::allocate<string>();
-		*send = "SET "+key+" "+value+"\r\n";
-		static_pointer_cast<Session>(session)->send = send;
-		static_pointer_cast<Session>(session)->mutex = mutex;
-		static_pointer_cast<Session>(session)->condition = condition;
-		raft->getListener()->addNewSession(session, re+":"+ to_string(port), IPV4);
-		condition->wait(*mutex);
-		re = std::move(static_pointer_cast<Session>(session)->response);
-		mutex->unlock();
+		re = forward(re+":"+ to_string(port), "SET "+key+" "+value);
 	}
 	if (re.empty()) {
 		re = "RETRY";
@@ -82,22 +58,27 @@ string KVDatabaseServer::del(const string &key) {
 		return "ERROR";
 	}
 	if (!re.empty()) {
-		auto mutex = ObjPool::allocate<Mutex>();
-		auto condition = ObjPool::allocate<Condition>();
-		mutex->lock();
-		auto session = server->getSession();
-		shared_ptr<string> send = ObjPool::allocate<string>();
-		*send = "DELETE "+key+"\r\n";
-		static_pointer_cast<Session>(session)->send = send;
-		static_pointer_cast<Session>(session)->mutex = mutex;
-		static_pointer_cast<Session>(session)->condition = condition;
-		raft->getListener()->addNewSession(session, re+":"+ to_string(port), IPV4);
-		condition->wait(*mutex);
-		re = std::move(static_pointer_cast<Session>(session)->response);
-		mutex->unlock();
+		re = forward(re+":"+ to_string(port), "DELETE "+key);
 	}
 	if (re.empty()) {
 		re = "RETRY";
 	}
 	return re;
+}
+
+string KVDatabaseServer::forward(const string &address, const string &cmd) {
+	LOG(Info, "forward["+address+"] "+cmd);
+	auto mutex = ObjPool::allocate<Mutex>();
+	auto condition = ObjPool::allocate<Condition>();
+	mutex->lock();
+	auto session = server->getSession();
+	shared_ptr<string> send = ObjPool::allocate<string>();
+	*send = cmd+"\r\n";
+	static_pointer_cast<Session>(session)->send = send;
+	static_pointer_cast<Session>(session)->mutex = mutex;
+	static_pointer_cast<Session>(session)->condition = condition;
+	raft->getListener()->addNewSession(session, address, IPV4);
+	condition->wait(*mutex);
+	mutex->unlock();
+	return static_pointer_cast<Session>(session)->response;
 }

@@ -19,6 +19,7 @@ public:
 	void serve();
 private:
 	friend class KVDatabase;
+	string forward(const string& address, const string& cmd);
 private:
 	int port;
 	shared_ptr<Raft> raft;

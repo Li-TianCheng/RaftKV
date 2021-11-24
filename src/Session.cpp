@@ -15,6 +15,7 @@ void Session::handleReadDone(iter pos, size_t n) {
 	if (cmd.size() > 2 && cmd[cmd.size()-2] == '\r' && cmd[cmd.size()-1] == '\n') {
 		vector<string> split = utils::split(cmd.substr(0, cmd.size()-2), ' ');
 		if (split.size() > 1) {
+			LOG(Access, cmd.substr(0, cmd.size()-2));
 			shared_ptr<string> reply = ObjPool::allocate<string>();
 			if (split[0] == "GET") {
 				if (split.size() == 2) {
