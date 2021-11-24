@@ -30,6 +30,13 @@ void Session::handleReadDone(iter pos, size_t n) {
 					*reply = "INPUT ERROR";
 				}
 			}
+			if (split[0] == "DELETE") {
+				if (split.size() == 2) {
+					*reply = KVDatabase::del(split[1]);
+				} else {
+					*reply = "INPUT ERROR";
+				}
+			}
 			*reply += "\r\n";
 			write(reply);
 		} else {

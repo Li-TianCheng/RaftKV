@@ -12,7 +12,9 @@ public:
 	static void serve();
 	static string get(const string& key);
 	static string set(const string& key, const string& value);
+	static string del(const string& key);
 	static void setHandle(const string& cmd);
+	static void delHandle(const string& cmd);
 private:
 	KVDatabase() = default;
 	static KVDatabaseServer& getInstance();

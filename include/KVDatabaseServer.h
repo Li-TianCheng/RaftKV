@@ -15,6 +15,7 @@ public:
 	KVDatabaseServer();
 	string get(const string& key);
 	string set(const string& key, const string& value);
+	string del(const string& key);
 	void serve();
 private:
 	friend class KVDatabase;
