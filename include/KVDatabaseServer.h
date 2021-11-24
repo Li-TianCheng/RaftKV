@@ -19,6 +19,7 @@ public:
 private:
 	friend class KVDatabase;
 private:
+	int port;
 	shared_ptr<Raft> raft;
 	shared_ptr<TcpServer<Session>> server;
 	unordered_map<string, string> data;
