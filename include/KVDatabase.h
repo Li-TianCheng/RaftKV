@@ -15,6 +15,8 @@ public:
 	static string del(const string& key);
 	static void setHandle(const string& cmd);
 	static void delHandle(const string& cmd);
+	static string genSnapshotHandler();
+	static void installSnapshotHandler(const string& snapshot);
 private:
 	KVDatabase() = default;
 	static KVDatabaseServer& getInstance();

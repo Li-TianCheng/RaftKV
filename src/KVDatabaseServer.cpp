@@ -11,6 +11,8 @@ KVDatabaseServer::KVDatabaseServer() : port(ConfigSystem::getConfig()["kv_databa
 	raft->getListener()->registerListener(port, IPV4, server);
 	raft->registerFuncHandler("SET", KVDatabase::setHandle);
 	raft->registerFuncHandler("DELETE", KVDatabase::delHandle);
+	raft->registerGenSnapshotHandler(KVDatabase::genSnapshotHandler);
+	raft->registerInstallSnapshotHandler(KVDatabase::installSnapshotHandler);
 }
 
 void KVDatabaseServer::serve() {
@@ -77,8 +79,9 @@ string KVDatabaseServer::forward(const string &address, const string &cmd) {
 	static_pointer_cast<Session>(session)->send = send;
 	static_pointer_cast<Session>(session)->mutex = mutex;
 	static_pointer_cast<Session>(session)->condition = condition;
-	raft->getListener()->addNewSession(session, address, IPV4);
-	condition->wait(*mutex);
+	if (raft->getListener()->addNewSession(session, address, IPV4)) {
+		condition->wait(*mutex);
+	}
 	mutex->unlock();
 	return static_pointer_cast<Session>(session)->response;
 }

@@ -34,3 +34,19 @@ void KVDatabase::delHandle(const string &cmd) {
 	getInstance().data.erase(cmd);
 }
 
+string KVDatabase::genSnapshotHandler() {
+	string snapshot;
+	for (auto& d : getInstance().data) {
+		snapshot += d.first+":"+d.second+";";
+	}
+	return snapshot;
+}
+
+void KVDatabase::installSnapshotHandler(const string &snapshot) {
+	vector<string> split = utils::split(snapshot, ';');
+	for (auto& s: split) {
+		vector<string> tmp = utils::split(s, ':');
+		getInstance().data[tmp[0]] = tmp[1];
+	}
+}
+

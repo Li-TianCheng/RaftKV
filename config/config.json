@@ -42,6 +42,7 @@
     "heartbeat_time": 10,
     "timeout_min": 150,
     "timeout_max": 300,
+    "snapshot_time": [12, 0, 0, 0],
     "merge_replication_num": 100
   },
   "kv_database": {
