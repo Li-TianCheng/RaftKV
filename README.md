@@ -1,6 +1,6 @@
-# RaftKVDatabase
+# RaftKV
 
-## 基于raft协议的高可用kv内存型数据库
+## 基于raft协议的高可用KeyValue服务
 
 ### 使用
 在config/config.json文件中配置集群信息并启动集群
