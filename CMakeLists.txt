@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(RaftKVDatabase)
+project(RaftKV)
 
 include_directories(./include ./modules)
 
@@ -9,6 +9,6 @@ add_subdirectory(modules)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(RaftKVDatabase main.cpp ${SOURCES_FILES})
+add_executable(RaftKV main.cpp ${SOURCES_FILES})
 
-target_link_libraries(RaftKVDatabase Modules)
+target_link_libraries(RaftKV Modules)

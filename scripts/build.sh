@@ -7,6 +7,8 @@ fi
 mkdir ../output
 mkdir ../output/bin
 mkdir ../output/config
+mkdir ../output/log
+mkdir ../output/raft_log
 cp ../config/config.json ../output/config
 
 if [ -d "../tmp/" ];then
@@ -16,7 +18,7 @@ mkdir ../tmp
 cd ../tmp
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make
-mv ./RaftKVDatabase ../output/bin
+mv ./RaftKV ../output/bin
 cd ..
 rm -r ./tmp
 echo "=================================构建完成================================="
